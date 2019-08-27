@@ -1,0 +1,134 @@
+---
+title: "Pop Quiz"
+author: "Data Science Certificate"
+date: "8/26/2019"
+output:
+  pdf_document:
+    latex_engine: lualatex
+---
+
+```{r setup, include=FALSE, warning=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message=FALSE, warning=FALSE)
+```
+
+
+```{r, message = FALSE}
+# Background Data
+library(tidyverse)
+library(kableExtra)
+data("storms")
+
+# data setup
+dat = storms %>% 
+  arrange(name) %>%
+  select(-ts_diameter, -hu_diameter) %>%
+  filter(!str_detect(name, "^A"))
+
+dat_display = dat %>%
+  group_by(name) %>%
+  sample_n(5, replace = TRUE) %>%
+  ungroup() 
+
+output_df = function(dat, n = 5){
+  kable(head(dat, n), "latex", booktabs = T) %>%
+  kable_styling(latex_options = "striped")
+}
+```
+
+#### You have been given the following dataset
+```{r}
+kable(head(dat_display, 12), "latex", booktabs = T) %>%
+  kable_styling(latex_options = "striped")
+```
+
+### Show the `tidyverse` code you would write to obtain the following tibbles
+
+Assume your data is a tibble stored in the variable `dat` -- therefore you would write code like:  
+
+```
+dat %>%
+  do_this() %>%
+  etc...
+```
+
+#### Number 1  
+Number of times each name appears
+```{r}
+dat %>% 
+  group_by(name) %>%
+  count() %>%
+  output_df()
+```
+.  
+.  
+.  
+.  
+.  
+
+
+#### Number 2  
+Calculate the mean `wind` and median `pressure` every `month` per `year`
+```{r}
+dat %>%
+  group_by(year, month) %>%
+  summarize(mean_wind = mean(wind),
+            median_pressure = median(pressure)) %>%
+  output_df()
+```
+.  
+.  
+.  
+.  
+.  
+
+
+
+
+#### Number 3
+Only display rows that have the `name` value `Wilma`
+```{r}
+dat %>%
+  filter(name == 'Wilma') %>%
+  output_df()
+```
+.  
+.  
+.  
+.  
+.  
+
+
+
+#### Number 4  
+Show the `status` in each row and each `year` as a column and all of the cells should be mean `wind`
+```{r}
+dat %>%
+  filter(year <= 1981) %>%
+  group_by(year, status) %>%
+  summarize(mean_wind = mean(wind)) %>%
+  spread(key = year, value = mean_wind) %>%
+  output_df()
+```
+.  
+.  
+.  
+.  
+.  
+
+
+
+#### Number 5
+Create a line plot to display the count of each `status` over time (by `year`), using status as a color
+```{r}
+dat %>%
+  group_by(status, year) %>%
+  count() %>%
+  ggplot(aes(x = year, y = n, col = status)) +
+  geom_line() + 
+  theme_bw() + 
+  scale_colour_grey()
+```
+
+
+
+
